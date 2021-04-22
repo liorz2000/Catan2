@@ -75,7 +75,12 @@ namespace Game1
 
             }
             conact_V_E_C();
-            Add_ports(ports);
+            if (ports != null)
+            {
+                Add_ports(ports);
+            }
+            
+            Add_cell_base_type(cells_with_base_type);
         }
 
         public void conact_V_E_C()
@@ -209,7 +214,17 @@ namespace Game1
         }
         public void Add_ports(Dictionary<(int, int, int), string> ports)
         {
-            
+            foreach ((int, int, int) edge in ports.Keys)
+            {
+                edges[(edge.Item1, edge.Item2, edge.Item3)].port = ports[(edge.Item1, edge.Item2, edge.Item3)];
+            }
+        }
+        public void Add_cell_base_type(HashSet<(int, int, string)>  cells_with_base_type)
+        {
+            foreach ((int, int, string) cell in cells_with_base_type)
+            {
+                cells[(cell.Item1, cell.Item2)].base_type = cell.Item3;
+            }
         }
 
     }

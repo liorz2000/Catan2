@@ -29,9 +29,13 @@ namespace Game1
         public string text_info;
         public string textfield_type; // or "regular" or "password"
 
-        public bool is_multipul_texture;
+        public bool is_multipul_texture_array;
         public Texture2D[] all_textures;
         public int phase_index;
+
+        public bool is_multipul_texture_dictionery;
+        public Dictionary<string, Texture2D> dictionary_textures;
+        public string phase_string;
 
         public Button ()
          //button nothig
@@ -50,7 +54,7 @@ namespace Game1
             this.layer = layer;
             
             this.is_text_field = false;
-            this.is_multipul_texture = false;
+            this.is_multipul_texture_array = false;
         }
 
 
@@ -72,7 +76,7 @@ namespace Game1
             this.is_clicked_now = false;
             this.layer = layer;
 
-            is_multipul_texture = false;
+            is_multipul_texture_array = false;
         }
         public Button(Rectangle rectangle, Texture2D[] all_textures, Action action, string shape, string[] activity_phases, int layer = 1)
         // filping texture
@@ -85,7 +89,22 @@ namespace Game1
             this.is_text_field = false;
             this.layer = layer;
 
-            this.is_multipul_texture = true;
+            this.is_multipul_texture_array = true;
+            this.all_textures = all_textures;
+            this.phase_index = 0;
+        }
+
+        public Button(Rectangle rectangle, Dictionary<string, Texture2D> dictionary_textures, Action action, string shape, string[] activity_phases, int layer = 1)
+        {
+            this.rectangle = rectangle;
+            this.shape = shape;
+            this.action = action;
+            this.activity_phases = activity_phases;
+            this.is_clicked_now = false;
+            this.is_text_field = false;
+            this.layer = layer;
+
+            this.is_multipul_texture_array = true;
             this.all_textures = all_textures;
             this.phase_index = 0;
         }

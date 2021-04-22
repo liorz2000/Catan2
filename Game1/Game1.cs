@@ -177,7 +177,7 @@ namespace Game1
                             text_field_that_now = button;
                             is_writing_now = true;
                         }
-                        if (button.is_multipul_texture)
+                        if (button.is_multipul_texture_array)
                         {
                             button.phase_index = (button.phase_index + 1) % (button.all_textures.Length);
                         }
@@ -255,7 +255,7 @@ namespace Game1
              
             foreach (var button in buttons_to_show[0].Values)
             {
-                if (button.is_multipul_texture)
+                if (button.is_multipul_texture_array)
                 {
                     spriteBatch.Draw(button.all_textures[button.phase_index], button.rectangle, null, Color.White, 0, new Vector2(0, 0), 0, layer_func(button.layer));
                 }
