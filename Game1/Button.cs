@@ -55,6 +55,8 @@ namespace Game1
             
             this.is_text_field = false;
             this.is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = false;
         }
 
 
@@ -77,9 +79,11 @@ namespace Game1
             this.layer = layer;
 
             is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = false;
         }
         public Button(Rectangle rectangle, Texture2D[] all_textures, Action action, string shape, string[] activity_phases, int layer = 1)
-        // filping texture
+        // filping texture array
         {
             this.rectangle = rectangle;
             this.shape = shape;
@@ -92,9 +96,12 @@ namespace Game1
             this.is_multipul_texture_array = true;
             this.all_textures = all_textures;
             this.phase_index = 0;
+
+            this.is_multipul_texture_dictionery = false;
         }
 
         public Button(Rectangle rectangle, Dictionary<string, Texture2D> dictionary_textures, Action action, string shape, string[] activity_phases, int layer = 1)
+        //fliping texture dictionery
         {
             this.rectangle = rectangle;
             this.shape = shape;
@@ -104,9 +111,11 @@ namespace Game1
             this.is_text_field = false;
             this.layer = layer;
 
-            this.is_multipul_texture_array = true;
-            this.all_textures = all_textures;
-            this.phase_index = 0;
+            this.is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = true;
+            this.dictionary_textures = new Dictionary<string, Texture2D>();
+            this.dictionary_
         }
 
         public bool Is_mouse_on()
