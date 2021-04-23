@@ -115,7 +115,7 @@ namespace Game1
 
             this.is_multipul_texture_dictionery = true;
             this.dictionary_textures = new Dictionary<string, Texture2D>();
-            this.dictionary_
+            this.phase_string = "";
         }
 
         public bool Is_mouse_on()
