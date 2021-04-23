@@ -23,7 +23,7 @@ namespace Game1
         public Dictionary<string, Texture2D> opitional_texturs;
         public string current_texture;
         public Button self_button;
-        public Button num_button; 
+        public Button num_button;  
         
 
         public Cell(int row, int colum, string base_type = "") 
