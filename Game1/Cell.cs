@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,6 +15,8 @@ namespace Game1
         public string resource; // "", "tree", "sheep", "grain", "ore", "break" ,"desert"
         public int cube_num;
 
+        public Dictionary<string, Texture2D> opitional_texturs;
+        public string current_texture;
         public Cell(int row, int colum, string base_type = "") 
         {
             this.row = row;
