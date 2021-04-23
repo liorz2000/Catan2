@@ -127,15 +127,15 @@ namespace Game1
             dowhite(textures_to_load["white_rec"]);
 
 
-            if (player == null)
+            /*if (player == null)
             {
                 menu_no_one();
             }
             else
             {
                 menu_someone(player);
-            }
-            //lern_draw_gray_cells();
+            }*/
+            lern_draw_gray_cells();
             base.LoadContent();
             //lern_serialize();
         }
