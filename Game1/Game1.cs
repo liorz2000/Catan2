@@ -386,13 +386,14 @@ namespace Game1
         }
         private void lern_draw_gray_cells()
         {
-            logic_map lmap = new logic_map(new HashSet<(int, int, string)>(){ (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2,-1 , "") , (2, 0, "") , (2, 1, "") });
-            //logic_map lmap = new logic_map(new HashSet<(int, int, string)>(new (int, int, string)[] { }));
+            //logic_map lmap = new logic_map(new HashSet<(int, int, string)>(){ (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2,-1 , "") , (2, 0, "") , (2, 1, "") });
+            HashSet<(int, int, string)> cells = new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") };
+            GraphicMap gmap = new GraphicMap(cells);
             Dictionary<string, Texture2D> texture_dict = new Dictionary<string, Texture2D>();
             texture_dict.Add("gray_hex", textures_to_load["gray_hex"]);
             texture_dict.Add("yellow_hex", textures_to_load["yellow_hex"]);
             texture_dict.Add("blue_hex", textures_to_load["blue_hex"]);
-            GraphicMap gmap = new GraphicMap(lmap, 100, new Point (200,200), texture_dict);
+            gmap.Add_button_cells( 100, new Point (200,200), texture_dict);
             foreach (Button button in gmap.cell_buttons)
             {
                 buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);
