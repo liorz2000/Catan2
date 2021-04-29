@@ -33,7 +33,8 @@ namespace Game1
         private List<string> names_of_texture_to_load = new List<string>(new string[] {"tree", "sheep", "grain", "ore", "break",
             "exit", "create_map","local_game","sign in", "login", "logout", "white_rec", "gray_rec", "back", "send", "ok",
             "Invite friends", "yellow",
-            "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex"});
+            "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex",
+            @"hex_numbers/2"});
 
         private Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
         private Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
@@ -135,7 +136,8 @@ namespace Game1
             {
                 menu_someone(player);
             }*/
-            lern_draw_gray_cells();
+            //lern_draw_gray_cells();
+            draw_2();
             base.LoadContent();
             //lern_serialize();
         }
@@ -398,6 +400,12 @@ namespace Game1
             {
                 buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);
             }
+        }
+        public void draw_2()
+        {
+            Rectangle rec = new Rectangle(new Point(50, 50), new Point(180, 180));
+            Button num2 = new Button(rec, textures_to_load[@"hex_numbers/2"], SaveExit, "rectangel", new string[] { "normal" });
+            buttons_to_show[1].Add("num2", num2);
         }
         public void when_log_out()
         {
