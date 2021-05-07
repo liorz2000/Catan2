@@ -34,7 +34,7 @@ namespace Game1
             "exit", "create_map","local_game","sign in", "login", "logout", "white_rec", "gray_rec", "back", "send", "ok",
             "Invite friends", "yellow",
             "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex",
-            @"hex_numbers/2"});
+            "num_circle"});
 
         private Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
         private Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
@@ -404,7 +404,7 @@ namespace Game1
         public void draw_2()
         {
             Rectangle rec = new Rectangle(new Point(50, 50), new Point(180, 180));
-            Button num2 = new Button(rec, textures_to_load[@"hex_numbers/2"], SaveExit, "rectangel", new string[] { "normal" });
+            Button num2 = new Button(rec, textures_to_load["num_circle"], SaveExit, "rectangel", new string[] { "normal" });
             buttons_to_show[1].Add("num2", num2);
         }
         public void when_log_out()
