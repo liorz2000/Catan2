@@ -34,8 +34,7 @@ namespace Game1
             "exit", "create_map","local_game","sign in", "login", "logout", "white_rec", "gray_rec", "back", "send", "ok",
             "Invite friends", "yellow",
             "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex",
-            "num_circle"});
-
+            "num_circle", "2", "3", "4", "5", "6", "8", "9", "10", "11", "12"});
         private Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
         private Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
         private string activity_phase = "normal"; // normal, decleration
@@ -403,9 +402,12 @@ namespace Game1
         }
         public void draw_2()
         {
-            Rectangle rec = new Rectangle(new Point(50, 50), new Point(180, 180));
-            Button num2 = new Button(rec, textures_to_load["num_circle"], SaveExit, "rectangel", new string[] { "normal" });
-            buttons_to_show[1].Add("num2", num2);
+            Rectangle rec11 = new Rectangle(new Point(200, 200), new Point(180, 180));
+            Button num11 = new Button(rec11, textures_to_load["11"], SaveExit, "circle", new string[] { "normal" });
+            buttons_to_show[1].Add("num11", num11);
+            Rectangle rec4 = new Rectangle(new Point(50, 50), new Point(180, 180));
+            Button num4 = new Button(rec4, textures_to_load["4"], SaveExit, "circle", new string[] { "normal" });
+            buttons_to_show[1].Add("num4", num4);
         }
         public void when_log_out()
         {

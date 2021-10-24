@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+//using Math;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -136,7 +137,10 @@ namespace Game1
             }
             if (shape == "circle")
             {
-                return false;
+                //return false;
+                //Math.Pow(value, power)
+                return Math.Pow(mouse.X - (rectangle.X + rectangle.Width / 2), 2) / Math.Pow(rectangle.Width / 2, 2) +
+                    Math.Pow(mouse.Y - (rectangle.Y + rectangle.Height / 2), 2) / Math.Pow(rectangle.Height / 2, 2) <= 1;
             }
             if (shape == "polygon")
             {
