@@ -133,7 +133,12 @@ namespace Game1
             }
             if (shape == "hex_in_rec")
             {
-
+                int constt = rectangle.Width * rectangle.Height +_hex_in_rec_compute_help_func(rectangle.X, rectangle.Y);
+                return (rectangle.X <= mouse.X & mouse.X <= rectangle.X + rectangle.Width &
+                    _hex_in_rec_compute_help_func(mouse.X, mouse.Y) >= constt &
+                    _hex_in_rec_compute_help_func(2 * rectangle.X + rectangle.Width- mouse.X, mouse.Y) >= constt &
+                    _hex_in_rec_compute_help_func(mouse.X, 2* rectangle.Y +rectangle.Height - mouse.Y) >= constt &
+                    _hex_in_rec_compute_help_func(2 * rectangle.X + rectangle.Width - mouse.X, 2 * rectangle.Y + rectangle.Height - mouse.Y) >= constt);
             }
             if (shape == "circle")
             {
@@ -147,6 +152,11 @@ namespace Game1
                 return false;
             }
             return false;
+        }
+
+        public int _hex_in_rec_compute_help_func(int x, int y)
+        {
+            return 4 * rectangle.Width * y + 2 * rectangle.Height * x;
         }
         public void create_a_polygon(Point [] new_vertices, Point new_center)
         {

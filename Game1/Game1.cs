@@ -51,7 +51,8 @@ namespace Game1
         private Button text_field_that_now = new Button();
         private bool is_writing_now = false;
         private Keys[] keys_that_prresed_copy = new Keys[0];
-        
+
+        private GraphicMap gmap = null;
 
         public Game1()
         {
@@ -136,7 +137,9 @@ namespace Game1
                 menu_someone(player);
             }*/
             //lern_draw_gray_cells();
-            draw_2();
+            //draw_2();
+            build_the_map(new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") });
+            draw_the_map();
             base.LoadContent();
             //lern_serialize();
         }
@@ -285,7 +288,14 @@ namespace Game1
                 
                 spriteBatch.DrawString(gtext.font, gtext.text, gtext.location, gtext.txtColor, 0, new Vector2(0, 0), 1, 0, layer_func(gtext.layer));
             }
-           
+
+            /*if (gmap != null):
+            {
+                foreach (Button button in gmap.cell_buttons)
+                {
+                    buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);
+                }
+            }*/
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -385,16 +395,15 @@ namespace Game1
 
 
         }
-        private void lern_draw_gray_cells()
+        private void build_the_map(HashSet<(int, int, string)> cells)
         {
             //logic_map lmap = new logic_map(new HashSet<(int, int, string)>(){ (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2,-1 , "") , (2, 0, "") , (2, 1, "") });
-            HashSet<(int, int, string)> cells = new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") };
-            GraphicMap gmap = new GraphicMap(cells);
-            Dictionary<string, Texture2D> texture_dict = new Dictionary<string, Texture2D>();
-            texture_dict.Add("gray_hex", textures_to_load["gray_hex"]);
-            texture_dict.Add("yellow_hex", textures_to_load["yellow_hex"]);
-            texture_dict.Add("blue_hex", textures_to_load["blue_hex"]);
-            gmap.Add_button_cells( 100, new Point (200,200), texture_dict);
+            //HashSet<(int, int, string)> cells = new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") };
+            gmap = new GraphicMap(cells);
+            gmap.Add_button_cells( 100, new Point (200,200), textures_to_load);
+        }
+        private void draw_the_map()
+        {
             foreach (Button button in gmap.cell_buttons)
             {
                 buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);

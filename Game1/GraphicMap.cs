@@ -28,6 +28,7 @@ namespace Game1
 
 
         public List<Button> cell_buttons = new List<Button>();
+        public List<Button> num_buttons = new List<Button>();
 
         public GraphicMap(HashSet<(int, int, string)> cells_with_base_type, Dictionary<(int, int, int), string> ports = null)
         {
@@ -254,9 +255,18 @@ namespace Game1
                 Rectangle hex_rec = new Rectangle(new Point(zero_hex_center.X - step_size/2 + cellii.Item1 * step_size/2  + cellii.Item2 * step_size ,
                     zero_hex_center.Y - (int)Math.Round(step_size * r/2) + cellii.Item1* (int)Math.Round(step_size/r) )
                     , new Point(step_size, (int)Math.Round(r*step_size)));
-                Button new_hex = new Button(hex_rec, hex_textures, Game1.literally_nothing, "rectangel", new string[] { "normal" });
+                Button new_hex = new Button(hex_rec, hex_textures, Game1.literally_nothing, "hex_in_rec", new string[] { "normal" });
                 cell_buttons.Add(new_hex);
             }
+        }
+        public void add_num_to_cell((int, int) cellii, int cube_num)
+        {
+            cells[cellii].cube_num = cube_num;
+            Rectangle hex_rec = new Rectangle(new Point(zero_hex_center.X - step_size / 2 + cellii.Item1 * step_size / 2 + cellii.Item2 * step_size,
+                    zero_hex_center.Y - (int)Math.Round(step_size * r / 2) + cellii.Item1 * (int)Math.Round(step_size / r))
+                    , new Point(step_size, (int)Math.Round(r * step_size)));
+
+            //num_buttons.Add()
         }
     }
 }
