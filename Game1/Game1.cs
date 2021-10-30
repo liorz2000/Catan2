@@ -33,7 +33,7 @@ namespace Game1
         private List<string> names_of_texture_to_load = new List<string>(new string[] {"tree", "sheep", "grain", "ore", "break",
             "exit", "create_map","local_game","sign in", "login", "logout", "white_rec", "gray_rec", "back", "send", "ok",
             "Invite friends", "yellow",
-            "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex",
+            "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex","blue_yellow_hex",
             "num_circle", "2", "3", "4", "5", "6", "8", "9", "10", "11", "12"});
         private Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
         private Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
@@ -128,18 +128,11 @@ namespace Game1
             dowhite(textures_to_load["white_rec"]);
 
 
-            /*if (player == null)
-            {
-                menu_no_one();
-            }
-            else
-            {
-                menu_someone(player);
-            }*/
+            when_create_map();
             //lern_draw_gray_cells();
             //draw_2();
-            build_the_map(new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") });
-            draw_the_map();
+            //build_the_map(new HashSet<(int, int)>() { (0, 0), (0, 1), (0, 2),(0,3),(0,4),(0,5), (1, 0), (1, 1), (1, 2), (2, -1), (2, 0), (2, 1), (2,2) });
+            //draw_the_map();
             base.LoadContent();
             //lern_serialize();
         }
@@ -162,6 +155,28 @@ namespace Game1
                         button.is_clicked_now = true;
                     }
                 }
+
+                if (gmap != null)
+                {
+                    foreach (var cell in gmap.cells.Values)
+                    {
+                        if (cell.self_button != null)
+                        {
+                            if (cell.self_button.activity_phases.Contains(activity_phase) && cell.self_button.Is_mouse_on())
+                            {
+                                cell.self_button.is_clicked_now = true;
+                            }
+                        }
+
+                        if(cell.is_have_cube_num)
+                        {
+                            if (cell.self_button.activity_phases.Contains(activity_phase) && cell.self_button.Is_mouse_on())
+                            {
+                                cell.self_button.is_clicked_now = true;
+                            }
+                        }
+                    }
+                }
             }
             if (mouse.LeftButton == ButtonState.Released)
             {
@@ -173,20 +188,19 @@ namespace Game1
                 mouse_LeftButton_copy = false;
                 foreach (var button in buttons_to_show[0].Values)
                 {
-                    if (button.activity_phases.Contains(activity_phase) && button.is_clicked_now && button.Is_mouse_on())
+                    update_is_clicked_now(button);
+                }
+
+                if (gmap != null)
+                {
+                    foreach (var cell in gmap.cells.Values)
                     {
-                        button.action();
-                        if (button.is_text_field)
+                        update_is_clicked_now(cell.self_button);
+                        if (cell.is_have_cube_num)
                         {
-                            text_field_that_now = button;
-                            is_writing_now = true;
-                        }
-                        if (button.is_multipul_texture_array)
-                        {
-                            button.phase_index = (button.phase_index + 1) % (button.all_textures.Length);
+                            update_is_clicked_now(cell.num_button);
                         }
                     }
-                    button.is_clicked_now = false;
                 }
 
 
@@ -241,23 +255,59 @@ namespace Game1
                 text_to_show[0] = completly_change_of_texts;
                 completly_change_of_texts = null;
             }
-            
 
-            
-           
 
+
+            if (gmap != null && gmap.stage == 1 && text_to_show[0].ContainsKey("random land"))
+            {
+                update_rand_land_txt_color();
+            }
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
-        {
+        {   
+
             SpriteBatch spriteBatch = new SpriteBatch(GraphicsDevice);
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.BackToFront);
-             
+
+            
             foreach (var button in buttons_to_show[0].Values)
+            {
+                draw_button(button, spriteBatch);
+            }
+
+            
+
+            foreach (var gtext in text_to_show[0].Values)
+            {
+                
+                spriteBatch.DrawString(gtext.font, gtext.text, gtext.location, gtext.txtColor, 0, new Vector2(0, 0), 1, 0, layer_func(gtext.layer));
+            }
+
+            if (gmap != null)
+            {
+                foreach (var cell in gmap.cells.Values)
+                {
+                    draw_button(cell.self_button, spriteBatch);
+                    if (cell.is_have_cube_num)
+                    {
+                        draw_button(cell.num_button, spriteBatch);
+                    }
+                }
+            }
+            spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+
+        public void draw_button(Button button, SpriteBatch spriteBatch)
+        {
+            if (button != null)
             {
                 if (button.is_multipul_texture_array)
                 {
@@ -278,27 +328,28 @@ namespace Game1
                         spriteBatch.DrawString(button.gtext.font, button.gtext.text, button.gtext.location, button.gtext.txtColor, 0, new Vector2(0, 0), 1, 0, layer_func(button.layer, true));
                     }
                 }
-                
             }
-
-
-
-            foreach (var gtext in text_to_show[0].Values)
+        }
+        public void update_is_clicked_now(Button button)
+        {
+            if (button != null)
             {
-                
-                spriteBatch.DrawString(gtext.font, gtext.text, gtext.location, gtext.txtColor, 0, new Vector2(0, 0), 1, 0, layer_func(gtext.layer));
-            }
 
-            /*if (gmap != null):
-            {
-                foreach (Button button in gmap.cell_buttons)
+                if (button.activity_phases.Contains(activity_phase) && button.is_clicked_now && button.Is_mouse_on())
                 {
-                    buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);
+                    button.action();
+                    if (button.is_text_field)
+                    {
+                        text_field_that_now = button;
+                        is_writing_now = true;
+                    }
+                    if (button.is_multipul_texture_array)
+                    {
+                        button.phase_index = (button.phase_index + 1) % (button.all_textures.Length);
+                    }
                 }
-            }*/
-            spriteBatch.End();
-
-            base.Draw(gameTime);
+                button.is_clicked_now = false;
+            }
         }
         public float layer_func( int n, bool half = false)
         {
@@ -321,6 +372,19 @@ namespace Game1
                 }
                 outputFile.WriteLine(player.user_name);
                 Exit();
+            }
+        }
+        public void menu()
+        {
+            nums_to_remember = new Dictionary<string, int>();
+            gmap = null;
+            if (player == null)
+            {
+                menu_no_one();
+            }
+            else
+            {
+                menu_someone(player);
             }
         }
         public void menu_no_one()
@@ -385,30 +449,148 @@ namespace Game1
         {
             completly_change_of_buttons = new Dictionary<string, Button>();
             completly_change_of_texts = new Dictionary<string, GraphicText>();
-            nums_to_remember.Add("map size", 5);
 
             GraphicText title = new GraphicText(SpriteFont_to_load["title_font"], "Map Creation", new Vector2(700, 100), Color.Black);
             completly_change_of_texts.Add("title", title);
 
-            GraphicText hello = new GraphicText(SpriteFont_to_load["24font"], "Size of map: " + Convert.ToString(nums_to_remember["map size"]) , new Vector2(700, 400), Color.Black);
-            completly_change_of_texts.Add("hello", hello);
+            Rectangle map_size_plus_min_rec = new Rectangle(new Point(100, 200), new Point(200, 100));
+            add_plus_minus_system("map size", 5, map_size_plus_min_rec, when_increase_map_size, when_decrease_map_size);
+
+            Rectangle hex_size_plus_min_rec = new Rectangle(new Point(100, 320), new Point(200, 100));
+            add_plus_minus_system("hex size", 100, hex_size_plus_min_rec, when_increase_hex_size, when_decrease_hex_size);
+
+            Rectangle random_land_plus_min_rec = new Rectangle(new Point(100, 440), new Point(220, 110));
+            add_plus_minus_system("random land", 0, random_land_plus_min_rec, when_increase_rand_land, when_decrease_rand_land);
 
 
+            Rectangle back_rec = new Rectangle(new Point(100, 570), new Point(120, 50));
+            Button back = new Button(back_rec, textures_to_load["back"], menu, "rectangel", new string[] { "normal" });
+            completly_change_of_buttons.Add("back", back);
+            create_a_rec_map(nums_to_remember["map size"]);
+
         }
-        private void build_the_map(HashSet<(int, int, string)> cells)
+
+        public void add_plus_minus_system(string num_to_remember_name, int num_to_remember, Rectangle backround_rec, Action inc_func, Action dec_func)
         {
-            //logic_map lmap = new logic_map(new HashSet<(int, int, string)>(){ (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2,-1 , "") , (2, 0, "") , (2, 1, "") });
-            //HashSet<(int, int, string)> cells = new HashSet<(int, int, string)>() { (0, 0, ""), (0, 1, ""), (1, 0, ""), (1, 1, ""), (2, -1, ""), (2, 0, ""), (2, 1, "") };
-            gmap = new GraphicMap(cells);
-            gmap.Add_button_cells( 100, new Point (200,200), textures_to_load);
+            nums_to_remember.Add(num_to_remember_name, num_to_remember);
+
+            //GraphicText systems_text = new GraphicText(SpriteFont_to_load["24font"], num_to_remember_name +": " + Convert.ToString(nums_to_remember[num_to_remember_name]), new Vector2(100, 400), Color.Black, 2);
+            GraphicText systems_text = new GraphicText(SpriteFont_to_load["24font"], num_to_remember_name + ": " + Convert.ToString(nums_to_remember[num_to_remember_name]), new Vector2(backround_rec.X, backround_rec.Y), Color.Black, 2);
+            text_to_show[1].Add(num_to_remember_name, systems_text);
+
+            //Rectangle map_size_backround_rec = new Rectangle(new Point(100, 400), new Point(200, 100));
+            Button backround = new Button(backround_rec, textures_to_load["yellow"], literally_nothing, "rectangel", new string[] { "normal" });
+            buttons_to_show[1].Add(num_to_remember_name + "_backround", backround);
+
+            //Rectangle plus_rec = new Rectangle(new Point(200, 450), new Point(50, 50));
+            Rectangle plus_rec = new Rectangle(new Point(backround_rec.X + backround_rec.Width/2, backround_rec.Y + backround_rec.Height /2),
+                new Point(backround_rec.Width / 4, backround_rec.Height / 2));
+            Button plus = new Button(plus_rec, textures_to_load["plus"], inc_func, "rectangel", new string[] { "normal" }, 2);
+            buttons_to_show[1].Add(num_to_remember_name + "_plus", plus);
+
+            //Rectangle minus_rec = new Rectangle(new Point(100, 450), new Point(50, 50));
+            Rectangle minus_rec = new Rectangle(new Point(backround_rec.X, backround_rec.Y + backround_rec.Height / 2),
+                new Point(backround_rec.Width / 4, backround_rec.Height / 2));
+            Button minus = new Button(minus_rec, textures_to_load["minus"], dec_func, "rectangel", new string[] { "normal" }, 2);
+            buttons_to_show[1].Add(num_to_remember_name + "_minus", minus);
         }
-        private void draw_the_map()
+        public void when_decrease_map_size()
         {
-            foreach (Button button in gmap.cell_buttons)
+            nums_to_remember["map size"] -= 1;
+            text_to_show[0]["map size"].text = "map size: " + Convert.ToString(nums_to_remember["map size"]);
+            //create_a_rec_map(nums_to_remember["map size"]);
+            int size = nums_to_remember["map size"];
+            for (int j = 0; j < size +1; j++ )
             {
-                buttons_to_show[1].Add(button.rectangle.X.ToString() + "," + button.rectangle.Y.ToString(), button);
+                gmap.remove_cell_stage1((size, j-size/2));
+            }
+            for (int i = 0; i < size ; i++)
+            {
+                gmap.remove_cell_stage1((i, size - i/2));
             }
         }
+        public void when_increase_map_size()
+        {
+            nums_to_remember["map size"] += 1;
+            text_to_show[0]["map size"].text = "map size: " + Convert.ToString(nums_to_remember["map size"]);
+            //create_a_rec_map(nums_to_remember["map size"]);
+            int size = nums_to_remember["map size"]-1;
+            for (int j = 0; j < size + 1; j++)
+            {
+                gmap.add_cell_stage1((size, j - size / 2));
+            }
+            for (int i = 0; i < size; i++)
+            {
+                gmap.add_cell_stage1((i, size - i / 2));
+            }
+        }
+        public void update_rand_land_txt_color()
+        {
+            if (nums_to_remember["random land"] < 0 || nums_to_remember["random land"] > gmap.get_random_sea_land_number_stage1())
+            {
+                text_to_show[0]["random land"].txtColor = Color.Red;
+            }
+            else
+            {
+                text_to_show[0]["random land"].txtColor = Color.Black;
+            }
+        }
+        public void when_decrease_rand_land()
+        {
+            nums_to_remember["random land"] -= 1;
+            text_to_show[0]["random land"].text = "random land: " + Convert.ToString(nums_to_remember["random land"]);
+        }
+        public void when_increase_rand_land()
+        {
+            nums_to_remember["random land"] += 1;
+            text_to_show[0]["random land"].text = "random land: " + Convert.ToString(nums_to_remember["random land"]);
+        }
+        public void when_decrease_hex_size()
+        {
+            nums_to_remember["hex size"] -= 10;
+            text_to_show[0]["hex size"].text = "hex size: " + Convert.ToString(nums_to_remember["hex size"]);
+            gmap.set_step_size(gmap.step_size - 10);
+        }
+        public void when_increase_hex_size()
+        {
+            nums_to_remember["hex size"] += 10;
+            text_to_show[0]["hex size"].text = "hex size: " + Convert.ToString(nums_to_remember["hex size"]);
+            gmap.set_step_size(gmap.step_size + 10);
+        }
+
+        public void create_a_rec_map(int size)
+        {
+            HashSet<(int, int)> rec_indexes = new HashSet<(int, int)>();
+            int i;
+            int j;
+            for (i = 0; i < size; i++)
+            {
+                //k = size - i / 2;
+                for (j = 0; j < size; j++) 
+                {
+                    rec_indexes.Add((i, j-i/2));
+                }
+            }
+            gmap = new GraphicMap(textures_to_load, rec_indexes);
+            gmap.add_cell_self_buttons_stage1(100, new Point(400, 300));
+        }
+        private void build_the_map(HashSet<(int, int)> cells)
+        {
+            gmap = new GraphicMap(textures_to_load,cells);
+            gmap.add_cell_self_buttons_stage1( 100, new Point (400,300));
+            //gmap.cells[(0, 0)].add_resource("tree", textures_to_load["tree"]);
+            gmap.cells[(0, 0)].add_cube_num(5, textures_to_load["5"], gmap.step_size / 4);
+            gmap.cells[(0, 1)].add_cube_num(2, textures_to_load["2"], gmap.step_size / 4);
+            gmap.cells[(0, 2)].add_cube_num(3, textures_to_load["3"], gmap.step_size / 4); 
+            gmap.cells[(1,0)].add_cube_num(4, textures_to_load["4"], gmap.step_size / 4);
+            gmap.cells[(1, 1)].add_cube_num(6, textures_to_load["6"], gmap.step_size / 4);
+            gmap.cells[(2, -1)].add_cube_num(8, textures_to_load["8"], gmap.step_size / 4);
+            gmap.cells[(2, 0)].add_cube_num(9, textures_to_load["9"], gmap.step_size / 4);
+            gmap.cells[(2, 1)].add_cube_num(10, textures_to_load["10"], gmap.step_size / 4);
+            gmap.cells[(1,2)].add_cube_num(11, textures_to_load["11"], gmap.step_size / 4);
+            gmap.cells[(2, 2)].add_cube_num(12, textures_to_load["12"], gmap.step_size / 4);
+        }
+        
         public void draw_2()
         {
             Rectangle rec11 = new Rectangle(new Point(200, 200), new Point(180, 180));

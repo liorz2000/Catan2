@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Game1
 {
-    class Button
+    public class Button
     {
         public Rectangle rectangle;
         public Texture2D texture2D;
@@ -45,7 +45,7 @@ namespace Game1
         }
         public Button (Rectangle rectangle, Texture2D texture2D, Action action, string shape, string[] activity_phases, int layer = 1  )
         // regular button
-        {
+        {   
             this.rectangle = rectangle;
             this.texture2D = texture2D;
             this.shape = shape;

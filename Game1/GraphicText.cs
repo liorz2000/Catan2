@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Game1
 {
-    class GraphicText
+    public class GraphicText
     {
         public SpriteFont font;
         public string text;
