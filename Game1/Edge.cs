@@ -10,11 +10,15 @@ namespace Game1
         public int row;
         public int colum;
         public int direction; // 1, 5 ,9
+
+        public bool is_determine_is_port = false;
+        public bool is_port;
+
         public string port; // "3:1", "tree", "sheep", "grain", "ore", "break" ,""
         public Dictionary<(int, int, bool), Vertex> vertices;
 
-        public Color road;
-
+        public Color players_color;
+        public Button self_button;
 
         public Edge(int row, int colum, int direction, string port = "")
         {
@@ -25,7 +29,7 @@ namespace Game1
             vertices = new Dictionary<(int, int,bool), Vertex>();
         }
 
-        public Edge(int row, int colum, int direction, string port , Color road)
+        public Edge(int row, int colum, int direction, string port , Color players_color)
         {
             this.row = row;
             this.colum = colum;
@@ -33,7 +37,7 @@ namespace Game1
             this.port = port;
             vertices = new Dictionary<(int, int, bool), Vertex>();
 
-            this.road = road;
+            this.players_color = players_color;
         }
 
     }

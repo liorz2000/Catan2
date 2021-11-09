@@ -50,6 +50,9 @@ namespace Game1
             this.cube_num = cube_num;
             int x_center = self_button.rectangle.X + self_button.rectangle.Width / 2;
             int y_center = self_button.rectangle.Y + self_button.rectangle.Height / 2;
+            Game1.declear(Convert.ToString(x_center), ", "); /////
+            Game1.declear(Convert.ToString(y_center), ", "); /////
+            Game1.declear("This is cordinates at Cell.add_cube_num"); /////
             Rectangle r = new Rectangle(new Point(x_center - raduis, y_center - raduis), new Point(2 * raduis, 2 * raduis));
             num_button = new Button(r, texture2D, self_button.action, self_button.shape, self_button.activity_phases, self_button.layer + 1);
         }

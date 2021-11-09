@@ -34,16 +34,17 @@ namespace Game1
             "exit", "create_map","local_game","sign in", "login", "logout", "white_rec", "gray_rec", "back", "send", "ok",
             "Invite friends", "yellow",
             "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex","blue_yellow_hex",
-            "num_circle", "2", "3", "4", "5", "6", "8", "9", "10", "11", "12"});
-        private Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
-        private Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
-        private string activity_phase = "normal"; // normal, decleration
+            "num_circle", "2", "3", "4", "5", "6", "8", "9", "10", "11", "12"
+        ,"help", "stage2", "texture_test"});
+        private static Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
+        private static Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
+        private static string activity_phase = "normal"; // normal, decleration
         private Dictionary<string, Button> completly_change_of_buttons = null;
         //private Dictionary<string, GraphicMap> maps_to_show = new Dictionary<string, GraphicMap>();
 
         private List<string> names_of_SpriteFont_to_load = new List<string>(new string[] { "title_font", "24font" });
-        private Dictionary<string, SpriteFont> SpriteFont_to_load = new Dictionary<string, SpriteFont>();
-        private Dictionary<string, GraphicText>[] text_to_show = new Dictionary<string, GraphicText>[3];
+        private static Dictionary<string, SpriteFont> SpriteFont_to_load = new Dictionary<string, SpriteFont>();
+        private static Dictionary<string, GraphicText>[] text_to_show = new Dictionary<string, GraphicText>[3];
         private Dictionary<string, GraphicText> completly_change_of_texts = null;
 
         private Dictionary<string, int> nums_to_remember = new Dictionary <string ,int>();
@@ -127,10 +128,15 @@ namespace Game1
             }
             dowhite(textures_to_load["white_rec"]);
 
+            //Texture2D texture2D = new Texture2D(GraphicsDevice, 100, 100);
 
             when_create_map();
+            //check_clock_wise();
             //lern_draw_gray_cells();
             //draw_2();
+            //check_texture_info();
+            //check_is_in_polygon();
+            //draw_polygon();
             //build_the_map(new HashSet<(int, int)>() { (0, 0), (0, 1), (0, 2),(0,3),(0,4),(0,5), (1, 0), (1, 1), (1, 2), (2, -1), (2, 0), (2, 1), (2,2) });
             //draw_the_map();
             base.LoadContent();
@@ -304,7 +310,20 @@ namespace Game1
             base.Draw(gameTime);
         }
 
-
+        public Texture2D copy_texture(Texture2D texture)
+        {
+            int length = texture.Width * texture.Height;
+            Texture2D new_texture = new Texture2D(GraphicsDevice, texture.Width,texture.Height);
+            Color[] old_texture_data = new Color[length];
+            Color[] new_texture_data = new Color[length];
+            texture.GetData(old_texture_data);
+            for (int i = 0; i < length; i++)
+            {
+                new_texture_data[i] = old_texture_data[i];
+            }
+            new_texture.SetData(new_texture_data);
+            return new_texture;
+        }
         public void draw_button(Button button, SpriteBatch spriteBatch)
         {
             if (button != null)
@@ -450,26 +469,54 @@ namespace Game1
             completly_change_of_buttons = new Dictionary<string, Button>();
             completly_change_of_texts = new Dictionary<string, GraphicText>();
 
-            GraphicText title = new GraphicText(SpriteFont_to_load["title_font"], "Map Creation", new Vector2(700, 100), Color.Black);
+            GraphicText title = new GraphicText(SpriteFont_to_load["title_font"], "Map Creation", new Vector2(500, 50), Color.Black);
             completly_change_of_texts.Add("title", title);
 
-            Rectangle map_size_plus_min_rec = new Rectangle(new Point(100, 200), new Point(200, 100));
+            Rectangle map_size_plus_min_rec = new Rectangle(new Point(100, 250), new Point(200, 100));
             add_plus_minus_system("map size", 5, map_size_plus_min_rec, when_increase_map_size, when_decrease_map_size);
 
-            Rectangle hex_size_plus_min_rec = new Rectangle(new Point(100, 320), new Point(200, 100));
+            Rectangle hex_size_plus_min_rec = new Rectangle(new Point(100, 370), new Point(200, 100));
             add_plus_minus_system("hex size", 100, hex_size_plus_min_rec, when_increase_hex_size, when_decrease_hex_size);
 
-            Rectangle random_land_plus_min_rec = new Rectangle(new Point(100, 440), new Point(220, 110));
+            Rectangle random_land_plus_min_rec = new Rectangle(new Point(100, 490), new Point(220, 110));
             add_plus_minus_system("random land", 0, random_land_plus_min_rec, when_increase_rand_land, when_decrease_rand_land);
 
-
-            Rectangle back_rec = new Rectangle(new Point(100, 570), new Point(120, 50));
+            Rectangle help_rec = new Rectangle(new Point(100, 620), new Point(180, 75));
+            Button help = new Button(help_rec, textures_to_load["help"], help_stage_1, "rectangel", new string[] { "normal" });
+            completly_change_of_buttons.Add("help", help);
+            
+            Rectangle stage2_rec = new Rectangle(new Point(100, 720), new Point(180, 75));
+            Button stage2 = new Button(stage2_rec, textures_to_load["stage2"], pass_to_stage_2, "rectangel", new string[] { "normal" });
+            completly_change_of_buttons.Add("stage2", stage2);
+            
+            Rectangle back_rec = new Rectangle(new Point(100, 820), new Point(180, 75));
             Button back = new Button(back_rec, textures_to_load["back"], menu, "rectangel", new string[] { "normal" });
             completly_change_of_buttons.Add("back", back);
+            
             create_a_rec_map(nums_to_remember["map size"]);
 
+            draw_some_edges();
         }
-
+        public void pass_to_stage_2()
+        {
+            if (text_to_show[0]["random land"].txtColor == Color.Red)
+            {
+                declear("Not valid random land balance");
+            }
+            else
+            {
+                gmap.level_up_to_stage2();
+            }
+        }
+        public void help_stage_1()
+        {
+            declear("You are in stage 1 of map creaiton!\n\n" +
+                "Yellow cells are land cells.\n" +
+                "Blue cells are sea cells.\n" + 
+                "Yellow-Blue are random 'land or sea' hexs.\n"+
+                "With 'random land' you detrmine how much land\n"+
+                "cells will be among the random.");
+        }
         public void add_plus_minus_system(string num_to_remember_name, int num_to_remember, Rectangle backround_rec, Action inc_func, Action dec_func)
         {
             nums_to_remember.Add(num_to_remember_name, num_to_remember);
@@ -573,32 +620,6 @@ namespace Game1
             }
             gmap = new GraphicMap(textures_to_load, rec_indexes);
             gmap.add_cell_self_buttons_stage1(100, new Point(400, 300));
-        }
-        private void build_the_map(HashSet<(int, int)> cells)
-        {
-            gmap = new GraphicMap(textures_to_load,cells);
-            gmap.add_cell_self_buttons_stage1( 100, new Point (400,300));
-            //gmap.cells[(0, 0)].add_resource("tree", textures_to_load["tree"]);
-            gmap.cells[(0, 0)].add_cube_num(5, textures_to_load["5"], gmap.step_size / 4);
-            gmap.cells[(0, 1)].add_cube_num(2, textures_to_load["2"], gmap.step_size / 4);
-            gmap.cells[(0, 2)].add_cube_num(3, textures_to_load["3"], gmap.step_size / 4); 
-            gmap.cells[(1,0)].add_cube_num(4, textures_to_load["4"], gmap.step_size / 4);
-            gmap.cells[(1, 1)].add_cube_num(6, textures_to_load["6"], gmap.step_size / 4);
-            gmap.cells[(2, -1)].add_cube_num(8, textures_to_load["8"], gmap.step_size / 4);
-            gmap.cells[(2, 0)].add_cube_num(9, textures_to_load["9"], gmap.step_size / 4);
-            gmap.cells[(2, 1)].add_cube_num(10, textures_to_load["10"], gmap.step_size / 4);
-            gmap.cells[(1,2)].add_cube_num(11, textures_to_load["11"], gmap.step_size / 4);
-            gmap.cells[(2, 2)].add_cube_num(12, textures_to_load["12"], gmap.step_size / 4);
-        }
-        
-        public void draw_2()
-        {
-            Rectangle rec11 = new Rectangle(new Point(200, 200), new Point(180, 180));
-            Button num11 = new Button(rec11, textures_to_load["11"], SaveExit, "circle", new string[] { "normal" });
-            buttons_to_show[1].Add("num11", num11);
-            Rectangle rec4 = new Rectangle(new Point(50, 50), new Point(180, 180));
-            Button num4 = new Button(rec4, textures_to_load["4"], SaveExit, "circle", new string[] { "normal" });
-            buttons_to_show[1].Add("num4", num4);
         }
         public void when_log_out()
         {
@@ -759,10 +780,6 @@ namespace Game1
                 }
             }
         }
-        public void login(string user_name)
-        {
-            
-        }
         public static Member find_player(string user_name)
         {
             if (user_name == "")
@@ -785,20 +802,34 @@ namespace Game1
             Member m = null;
             return m;
         }
-        public void declear(string what_declear)
+        public static void declear(string what_declear, string end = "\n")
         {
-            activity_phase = "declear";
-            Rectangle declear_rec = new Rectangle(new Point(500, 300), new Point(700, 480));
-            Button declear = new Button(declear_rec, textures_to_load["yellow"], literally_nothing, "rectangel", new string[] { "declear" }, 2);
-            buttons_to_show[1].Add("declear", declear);
-            Rectangle ok_rec = new Rectangle(new Point(800, 680), new Point(100, 100));
-            Button ok = new Button(ok_rec, textures_to_load["ok"], when_ok, "rectangel", new string[] { "declear" }, 3);
-            buttons_to_show[1].Add("ok", ok);
-            GraphicText declear_text = new GraphicText(SpriteFont_to_load["24font"], what_declear , new Vector2(500, 300), Color.Black, 3);
-            text_to_show[1].Add("declear_text", declear_text);
+            if (activity_phase == "normal")
+            {
+                activity_phase = "declear";
+                Rectangle declear_rec = new Rectangle(new Point(500, 300), new Point(700, 480));
+                Button declear = new Button(declear_rec, textures_to_load["yellow"], literally_nothing, "rectangel", new string[] { "declear" }, 2);
+                buttons_to_show[1].Add("declear", declear);
+                Rectangle ok_rec = new Rectangle(new Point(800, 680), new Point(100, 100));
+                Button ok = new Button(ok_rec, textures_to_load["ok"], when_ok, "rectangel", new string[] { "declear" }, 3);
+                buttons_to_show[1].Add("ok", ok);
+                GraphicText declear_text = new GraphicText(SpriteFont_to_load["24font"], what_declear + end, new Vector2(500, 300), Color.Black, 3);
+                text_to_show[1].Add("declear_text", declear_text);
+            }
+            else if (activity_phase == "declear")
+            {
+                if (text_to_show[1].Keys.Contains("declear_text"))
+                {
+                    text_to_show[1]["declear_text"].text += what_declear + end;
+                }
+                else if(text_to_show[0].Keys.Contains("declear_text"))
+                {
+                    text_to_show[0]["declear_text"].text += what_declear + end;
+                }
+            }
 
         }
-        public void when_ok()
+        public static void when_ok()
         {
             activity_phase = "normal";
             buttons_to_show[2].Add("declear", buttons_to_show[0]["declear"]);
@@ -911,5 +942,169 @@ namespace Game1
             }
         }
 
+        /// <summary>
+        /// Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests
+        /// Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests
+        /// Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests Tests
+        /// </summary>
+        public void check_is_in_polygon()
+        {
+            Point p1 = new Point(100, 100);
+            Point p2 = new Point(200, 100);
+            Point p4 = new Point(200, 200);
+            Point p3 = new Point(100, 200);
+
+            Point q1 = new Point(150, 150);
+            Point q2 = new Point(150, 50);
+            //public Button(Point[] new_vertices, Texture2D texture2D, Action action, string[] activity_phases, int layer = 1)
+            Button b = new Button(new Point[] { p1, p2, p4, p3 }, textures_to_load["texture_test"], literally_nothing, new string[] { "normal" });
+            declear(Convert.ToString(b.check_if_in_polygon(q1))
+                + ", " + Convert.ToString(b.check_if_in_polygon(q2)));
+        }
+        public void draw_polygon()
+        {
+            Point p1 = new Point(100, 100);
+            Point p2 = new Point(200, 100);
+            Point p4 = new Point(200, 200);
+            Point p3 = new Point(100, 200);
+            Point p5 = new Point(150, 150);
+
+            Point q1 = new Point(100, 300);
+            Point q2 = new Point(200, 300);
+            Point q4 = new Point(200, 400);
+            Point q3 = new Point(100, 400);
+            Point q5 = new Point(50, 350);
+            Button b = new Button(new Point[] { p1, p2, p4 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
+
+            Rectangle r = new Rectangle(p1, p1);
+            Button c = new Button(r, copy_texture(textures_to_load["gray_rec"]), literally_nothing, "rectangel", new string[] { "normal" });
+
+            Button b1 = new Button(new Point[] { q1, q2, q4, q3, q5 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
+
+
+            buttons_to_show[1].Add("c", c);
+            buttons_to_show[1].Add("b", b);
+            buttons_to_show[1].Add("b1", b1);
+
+        }
+        public void draw_some_edges() // Here I write 11/9/2021 12:23
+        {
+            /*//r = 2/ sqrt(3)
+            Point O1 = gmap.zero_hex_center;
+            Point O2 = new Point(gmap.step_size / 2, (int)Math.Round(-gmap.step_size / gmap.r)) + O1;
+            Point v1 = new Point(0, (int)Math.Round(-gmap.step_size / Math.Sqrt(3))) + O1;
+            Point v2 = O1 + O2 - v1;
+
+            Point p1 = new Point((v1.X * 4 + O1.X) / 5, (v1.Y * 4 + O1.Y) / 5);
+            Point p2 = new Point((v1.X * 4 + O2.X) / 5, (v1.Y * 4 + O2.Y) / 5);
+            Point p3 = new Point((v2.X * 4 + O2.X) / 5, (v2.Y * 4 + O2.Y) / 5);
+            Point p4 = new Point((v2.X * 4 + O1.X) / 5, (v2.Y * 4 + O1.Y) / 5);
+
+            Point[] points_e001 = new Point[] {p1,p2,p3,p4};
+            Button e001 = new Button(points_e001, copy_texture(textures_to_load["gray_rec"]), literally_nothing, new string[] { "normal" }, 2);
+            buttons_to_show[1].Add("e001", e001);*/
+            draw_one_edge((0, 0, 1));
+            draw_one_edge((0, 1, 1));
+            draw_one_edge((0, 0, 5));
+            draw_one_edge((0, 0, 9));
+
+
+        }
+
+        public void draw_one_edge((int, int ,int ) edgeiii, int ratio = 5)
+        {
+            int row = edgeiii.Item1;
+            int col = edgeiii.Item2;
+            Point O1 = new Point(gmap.zero_hex_center.X + edgeiii.Item1 * gmap.step_size / 2 + edgeiii.Item2 * gmap.step_size,
+                   gmap.zero_hex_center.Y - edgeiii.Item1 * (int)Math.Round(gmap.step_size / gmap.r));
+            Point v1 = new Point(0, 0);
+            Point v2 = new Point(0, 0);
+            Point O2 = new Point(0, 0);
+            if (edgeiii.Item3 == 1)
+            {
+                O2 = new Point(gmap.step_size / 2, (int)Math.Round(-gmap.step_size / gmap.r)) + O1;
+                v1 = new Point(0, (int)Math.Round(-gmap.step_size / Math.Sqrt(3))) + O1;
+                v2 = O1 + O2 - v1;
+            }
+            else if(edgeiii.Item3 == 5)
+            {
+                O2 = new Point(gmap.step_size / 2, (int)Math.Round(gmap.step_size / gmap.r)) + O1;
+                v1 = new Point(gmap.step_size / 2, (int)Math.Round(gmap.step_size /(2* Math.Sqrt(3)))) + O1;
+                v2 = O1 + O2 - v1;
+            }
+            else if (edgeiii.Item3 == 9)
+            {
+                O2 = new Point(-gmap.step_size, 0) + O1;
+                v1 = new Point(-gmap.step_size / 2, (int)Math.Round(gmap.step_size / (2 * Math.Sqrt(3)))) + O1;
+                v2 = O1 + O2 - v1;
+            }
+            Point p1 = new Point((v1.X * ratio + O1.X) / (ratio+1), (v1.Y * ratio + O1.Y) / (ratio + 1));
+            Point p2 = new Point((v1.X * ratio + O2.X) / (ratio + 1), (v1.Y * ratio + O2.Y) / (ratio + 1));
+            Point p3 = new Point((v2.X * ratio + O2.X) / (ratio + 1), (v2.Y * ratio + O2.Y) / (ratio + 1));
+            Point p4 = new Point((v2.X * ratio + O1.X) / (ratio + 1), (v2.Y * ratio + O1.Y) / (ratio + 1));
+
+            Point[] points_e001 = new Point[] { p1, p2, p3, p4 };
+            Button e001 = new Button(points_e001, copy_texture(textures_to_load["gray_rec"]), literally_nothing, new string[] { "normal" }, 2);
+            buttons_to_show[1].Add("e" + Convert.ToString(edgeiii.Item1)
+                + Convert.ToString(edgeiii.Item2)
+                + Convert.ToString(edgeiii.Item3), e001);
+        }
+        public void check_texture_info()
+        {
+
+            Texture2D texture = textures_to_load["texture_test"];
+            int length = texture.Width * texture.Height;
+            Rectangle r = new Rectangle(new Point(100, 300), new Point(100, 100));
+            Button c = new Button(r, texture, literally_nothing, "rectangle", new string[] { "normal" });
+            buttons_to_show[1].Add("c", c);
+            Color[] data = new Color[length];
+            texture.GetData(data);
+
+            declear("Width: " + Convert.ToString(texture.Width) +
+                "\n" + "Height: " + Convert.ToString(texture.Height) +
+                "\n" + "10's color: " + Convert.ToString(data[10]) +
+                "\n" + "70's color: " + Convert.ToString(data[70]));
+
+        }
+        public void check_clock_wise()
+        {
+            Point p1 = new Point(100, 100);
+            Point p2 = new Point(200, 100);
+            Point p3 = new Point(100, 200);
+            Point p4 = new Point(200, 200);
+            declear(Convert.ToString(Button.check_if_clock_wise(p1, p2, p3))
+                + ", " + Convert.ToString(Button.check_if_clock_wise(p1, p2, p4))
+                + ", " + Convert.ToString(Button.check_if_clock_wise(p1, p3, p2)));
+
+            Button b = new Button(new Point[] { p1, p2, p3 }, copy_texture(textures_to_load["white_rec"]), literally_nothing, new string[] { "normal" });
+            buttons_to_show[1].Add("b", b);
+
+            Button c = new Button(new Rectangle(new Point(100, 300), new Point(100, 100)), textures_to_load["white_rec"], literally_nothing, "rectangle", new string[] { "normal" });
+            buttons_to_show[1].Add("c", c);
+
+        }
+        private void build_the_map(HashSet<(int, int)> cells)
+        {
+            gmap = new GraphicMap(textures_to_load, cells);
+            gmap.add_cell_self_buttons_stage1(100, new Point(400, 300));
+            //gmap.cells[(0, 0)].add_resource("tree", textures_to_load["tree"]);
+            gmap.cells[(0, 0)].add_cube_num(5, textures_to_load["5"], gmap.step_size / 4);
+            gmap.cells[(0, 1)].add_cube_num(2, textures_to_load["2"], gmap.step_size / 4);
+            gmap.cells[(0, 2)].add_cube_num(3, textures_to_load["3"], gmap.step_size / 4);
+            gmap.cells[(1, 0)].add_cube_num(4, textures_to_load["4"], gmap.step_size / 4);
+            gmap.cells[(1, 1)].add_cube_num(6, textures_to_load["6"], gmap.step_size / 4);
+            gmap.cells[(2, -1)].add_cube_num(8, textures_to_load["8"], gmap.step_size / 4);
+            gmap.cells[(2, 0)].add_cube_num(9, textures_to_load["9"], gmap.step_size / 4);
+            gmap.cells[(2, 1)].add_cube_num(10, textures_to_load["10"], gmap.step_size / 4);
+            gmap.cells[(1, 2)].add_cube_num(11, textures_to_load["11"], gmap.step_size / 4);
+            gmap.cells[(2, 2)].add_cube_num(12, textures_to_load["12"], gmap.step_size / 4);
+        }
+
+        public void draw_2(Point p, int r)
+        {
+            Rectangle rec2 = new Rectangle(new Point(p.X - r, p.Y -r), new Point(2*r, 2*r));
+            Button num2 = new Button(rec2, textures_to_load["2"], SaveExit, "circle", new string[] { "normal" },2);
+            buttons_to_show[1].Add("num2" + Convert.ToString(p), num2);
+        }
     }
 }

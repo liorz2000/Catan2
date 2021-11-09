@@ -10,7 +10,7 @@ namespace Game1
     class GraphicMap
     {
 
-        static double r = 2/Math.Sqrt(3);
+        public double r = 2/Math.Sqrt(3);
 
 
         //public logic_map lmap = new logic_map(new HashSet<(int, int, string)>());
@@ -46,7 +46,6 @@ namespace Game1
             //stage2 intialization
             stage = 2;
             create_map_stage1(textures_given, cells_indexes);
-            add_the_edges_and_the_verteces_and_connect_them();
             foreach ((int, int) cellii in cells.Keys)
             {
                 if (sea_cells.Contains(cellii))
@@ -64,6 +63,8 @@ namespace Game1
                     cells[cellii].is_have_base_type = false;
                 }
             }
+            
+            add_edges();
         }
         public void conact_V_E_C()
         {
@@ -250,7 +251,7 @@ namespace Game1
             }
         }
 
-        public void add_the_edges_and_the_verteces_and_connect_them()
+        public void add_edges()
         {
             foreach ((int, int) cell in cells.Keys)
             {
@@ -272,7 +273,12 @@ namespace Game1
                         edges.Add(edge, new Edge(edge.Item1, edge.Item2, edge.Item3));
                     }
                 }
-
+            }
+        }
+        public void add_verteces_and_connect_all()
+        { 
+            foreach ((int, int) cell in cells.Keys)
+            {
                 //Add the vertises
 
                 (int, int, bool) v0 = (cell.Item1, cell.Item2, true);
@@ -320,6 +326,7 @@ namespace Game1
 
         public void add_cell_self_buttons_stage1(int step_size_given, Point zero_hex_center_given)
         {
+            
             step_size = step_size_given;
             zero_hex_center = zero_hex_center_given;
             textures = textures_given;
@@ -401,18 +408,69 @@ namespace Game1
                 }
             }
 
+            
             if (check_connectivity(all_cells))
             {
-
+                //stage2 intialization
+                stage = 2;
+                //create_map_stage1(textures_given, cells_indexes);
+                //add_the_edges_and_the_verteces_and_connect_them();
+                foreach ((int, int) cellii in cells.Keys)
+                {
+                    if (sea_cells.Contains(cellii))
+                    {
+                        cells[cellii].is_have_base_type = true;
+                        cells[cellii].base_type = "sea";
+                    }
+                    else if(land_cells.Contains(cellii))
+                    {
+                        cells[cellii].is_have_base_type = true;
+                        cells[cellii].base_type = "land";
+                    }
+                    else if(sea_land_cells.Contains(cellii))
+                    {
+                        cells[cellii].is_have_base_type = false;
+                    }
+                    else
+                    {
+                        remove_cell_stage1(cellii);
+                    }
+                }
+                change_button_cells_from_stage1_to_stage2();
+                add_edges();
+                add_edge_buttons_stage_2();
             }
             else
             {
-
+                Game1.declear("No connection between your cells");
             }
         }
-
+        public void change_button_cells_from_stage1_to_stage2()
+        {
+            foreach(Cell cell in cells.Values)
+            {
+                cell.self_button = new Button(cell.self_button.rectangle,
+                cell.self_button.all_textures[cell.self_button.phase_index], cell.self_button.action,
+                cell.self_button.shape, cell.self_button.activity_phases, cell.self_button.layer);
+            }
+        }
+        
+        public void add_edge_buttons_stage_2()
+        {
+            //fore
+        }
+        public string convert_hash_int_int_to_str(HashSet<(int,int)> hii)
+        {
+            string str = "";
+            foreach ((int, int) ii in hii)
+            {
+                str += "(" + Convert.ToString(ii.Item1) + "," + Convert.ToString(ii.Item2) + ")" + ",";
+            }
+            return str;
+        }
         public bool check_connectivity(HashSet<(int, int)> all_cells)
         {
+            // check empty hashset
             (int, int) first_cellii = (0,0);
             foreach ((int, int) cellii in all_cells)
             {
@@ -443,10 +501,11 @@ namespace Game1
                             next_first_islands_neighbours.Add(new_potential_neighbour);
                         }
                    }
-                    first_island.UnionWith(first_islands_neighbours);
-                    first_islands_neighbours = next_first_islands_neighbours;
-                    next_first_islands_neighbours = new HashSet<(int, int)>();
+                    
                 }
+                first_island.UnionWith(first_islands_neighbours);
+                first_islands_neighbours = next_first_islands_neighbours;
+                next_first_islands_neighbours = new HashSet<(int, int)>();
             }
             return (all_cells.Count == first_island.Count);
         }

@@ -21,7 +21,7 @@ namespace Game1
 
         public double angel;
         public double raduis;
-        public Point center;
+        //public Point center;
         public Point[] vertices;
         
         public GraphicText gtext;
@@ -44,7 +44,7 @@ namespace Game1
 
         }
         public Button (Rectangle rectangle, Texture2D texture2D, Action action, string shape, string[] activity_phases, int layer = 1  )
-        // regular button
+        // regular
         {   
             this.rectangle = rectangle;
             this.texture2D = texture2D;
@@ -119,6 +119,88 @@ namespace Game1
             this.phase_string = "";
         }
 
+        public Button(Point[] new_vertices, Texture2D texture2D, Action action, string[] activity_phases, int layer = 1)
+        // regular button, but polygon, one color!!!
+        // new verteces must be with clock direction!!!
+        {
+            int min_x = new_vertices[0].X;
+            int max_x = new_vertices[0].X;
+            int min_y = new_vertices[0].Y;
+            int max_y = new_vertices[0].Y;
+            foreach(Point v in new_vertices)
+            {
+                if (v.X>max_x)
+                {
+                    max_x = v.X;
+                }
+                if (v.X < min_x)
+                {
+                    min_x = v.X;
+                }
+                if (v.Y > max_y)
+                {
+                    max_y = v.Y;
+                }
+                if (v.Y < min_y)
+                {
+                    min_y = v.Y;
+                }
+            }
+
+            rectangle = new Rectangle(new Point(min_x, min_y), new Point(max_x - min_x, max_y - min_y));
+            vertices = new_vertices;
+
+            this.texture2D = texture2D;
+            (int, int) only_test = cut_texture();
+            shape = "polygon";
+            this.action = action;
+            this.activity_phases = activity_phases;
+            this.is_clicked_now = false;
+            this.is_text_field = false;
+            this.layer = layer;
+
+            this.is_text_field = false;
+            this.is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = false;
+
+        }
+        
+        public (int, int) cut_texture()
+        {
+            Color[] c = new Color[texture2D.Width * texture2D.Height];
+            texture2D.GetData(c);
+            Color[,] c_mat = new Color[texture2D.Height, texture2D.Width];//maybe oposite
+
+          
+            for (int col = 0; col < texture2D.Width; col++)
+                {
+                for (int row = 0; row < texture2D.Height; row++)
+                {
+                    try
+                    {
+                       
+                        c_mat[row, col] = c[row * texture2D.Width + col];
+                    }
+                    catch
+                    {
+                        Game1.declear(Convert.ToString(row) + ", " + Convert.ToString(col));
+                        return (row, col);
+
+                    }
+                    int point_of_texcture_pixel_in_rec_x = rectangle.X + col * rectangle.Width / texture2D.Width;
+                    int point_of_texcture_pixel_in_rec_y = rectangle.Y + row * rectangle.Height / texture2D.Height;
+                    Point p = new Point(point_of_texcture_pixel_in_rec_x, point_of_texcture_pixel_in_rec_y);
+                    if (!check_if_in_polygon(p))
+                    {
+                        c_mat[row, col] = Color.Transparent;
+                    }
+                    c[row * texture2D.Width + col] = c_mat[row, col];
+                }
+            }
+            texture2D.SetData(c);
+            return (-1, -1);
+        }
         public bool Is_mouse_on()
         {
             MouseState mouse = Mouse.GetState();
@@ -149,7 +231,7 @@ namespace Game1
             }
             if (shape == "polygon")
             {
-                return false;
+                return check_if_in_polygon(mouse.Position);
             }
             return false;
         }
@@ -158,12 +240,22 @@ namespace Game1
         {
             return 4 * rectangle.Width * y + 2 * rectangle.Height * x;
         }
-        public void create_a_polygon(Point [] new_vertices, Point new_center)
+        public bool check_if_in_polygon(Point point)
         {
 
-            this.vertices = new_vertices;
-            this.center = new_center;
+            int len = vertices.Length;
+            bool in_polygon = true;
 
+            for (int i = 0; i <len; i ++)
+            {
+                in_polygon &= check_if_clock_wise(vertices[i], vertices[(i+1)%len], point);
+            }
+            return in_polygon;
+
+        }
+        public static bool check_if_clock_wise(Point p1, Point p2, Point p3)
+        {
+            return p1.X * p2.Y + p2.X * p3.Y + p3.X * p1.Y - (p1.X * p3.Y + p2.X * p1.Y + p3.X * p2.Y) > 0;
         }
         public void rotate(double rot_angel)
         {
