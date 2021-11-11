@@ -495,7 +495,7 @@ namespace Game1
             
             create_a_rec_map(nums_to_remember["map size"]);
 
-            draw_some_edges();
+            //draw_some_edges();
         }
         public void pass_to_stage_2()
         {
@@ -506,6 +506,11 @@ namespace Game1
             else
             {
                 gmap.level_up_to_stage2();
+                if (gmap.stage == 2)
+                {
+                    remove_plus_minus_system("map size");
+                    remove_plus_minus_system("random land");
+                }
             }
         }
         public void help_stage_1()
@@ -540,6 +545,14 @@ namespace Game1
                 new Point(backround_rec.Width / 4, backround_rec.Height / 2));
             Button minus = new Button(minus_rec, textures_to_load["minus"], dec_func, "rectangel", new string[] { "normal" }, 2);
             buttons_to_show[1].Add(num_to_remember_name + "_minus", minus);
+        }
+        public void remove_plus_minus_system(string num_to_remember_name)
+        {
+            nums_to_remember.Remove(num_to_remember_name);
+            text_to_show[2].Add(num_to_remember_name, text_to_show[0][num_to_remember_name]);
+            buttons_to_show[2].Add(num_to_remember_name + "_backround", buttons_to_show[0][num_to_remember_name + "_backround"]);
+            buttons_to_show[2].Add(num_to_remember_name + "_plus", buttons_to_show[0][num_to_remember_name + "_plus"]);
+            buttons_to_show[2].Add(num_to_remember_name + "_minus", buttons_to_show[0][num_to_remember_name + "_minus"]);
         }
         public void when_decrease_map_size()
         {
@@ -987,7 +1000,7 @@ namespace Game1
             buttons_to_show[1].Add("b1", b1);
 
         }
-        public void draw_some_edges() // Here I write 11/9/2021 12:23
+        public void draw_some_edges() 
         {
             /*//r = 2/ sqrt(3)
             Point O1 = gmap.zero_hex_center;
@@ -1015,8 +1028,8 @@ namespace Game1
         {
             int row = edgeiii.Item1;
             int col = edgeiii.Item2;
-            Point O1 = new Point(gmap.zero_hex_center.X + edgeiii.Item1 * gmap.step_size / 2 + edgeiii.Item2 * gmap.step_size,
-                   gmap.zero_hex_center.Y - edgeiii.Item1 * (int)Math.Round(gmap.step_size / gmap.r));
+            Point O1 = new Point(gmap.zero_hex_center.X + row * gmap.step_size / 2 + col * gmap.step_size,
+                   gmap.zero_hex_center.Y - row * (int)Math.Round(gmap.step_size / gmap.r));
             Point v1 = new Point(0, 0);
             Point v2 = new Point(0, 0);
             Point O2 = new Point(0, 0);
