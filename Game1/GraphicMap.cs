@@ -27,6 +27,7 @@ namespace Game1
 
         public int step_size;
         public Point zero_hex_center;
+        public int edge_ratio = 5;
         public Dictionary<string, Texture2D> textures;
 
 
@@ -180,18 +181,18 @@ namespace Game1
             {
                 if (edge.direction == 1)
                 {
-                    edge.vertices.Add((edge.row, edge.colum, true), vertices[(edge.row, edge.colum, true)]);
-                    edge.vertices.Add((edge.row - 1, edge.colum + 1, false), vertices[(edge.row - 1, edge.colum + 1, false)]);
+                    edge.vertices.Add((edge.row, edge.col, true), vertices[(edge.row, edge.col, true)]);
+                    edge.vertices.Add((edge.row - 1, edge.col + 1, false), vertices[(edge.row - 1, edge.col + 1, false)]);
                 }
                 if (edge.direction == 5)
                 {
-                    edge.vertices.Add((edge.row + 1, edge.colum, true), vertices[(edge.row + 1, edge.colum, true)]);
-                    edge.vertices.Add((edge.row, edge.colum, false), vertices[(edge.row, edge.colum, false)]);
+                    edge.vertices.Add((edge.row + 1, edge.col, true), vertices[(edge.row + 1, edge.col, true)]);
+                    edge.vertices.Add((edge.row, edge.col, false), vertices[(edge.row, edge.col, false)]);
                 }
                 if (edge.direction == 9)
                 {
-                    edge.vertices.Add((edge.row + 1, edge.colum - 1, true), vertices[(edge.row + 1, edge.colum - 1, true)]);
-                    edge.vertices.Add((edge.row - 1, edge.colum, false), vertices[(edge.row - 1, edge.colum, false)]);
+                    edge.vertices.Add((edge.row + 1, edge.col - 1, true), vertices[(edge.row + 1, edge.col - 1, true)]);
+                    edge.vertices.Add((edge.row - 1, edge.col, false), vertices[(edge.row - 1, edge.col, false)]);
                 }
             }
         }
@@ -229,6 +230,14 @@ namespace Game1
         public void set_step_size(int new_step_size)
         {
             step_size = new_step_size;
+            set_step_size_cell_self_buttons();
+            if (stage == 2)
+            {
+                set_step_size_edge_self_buttons();
+            }
+        }
+        public void set_step_size_cell_self_buttons()
+        {
             foreach ((int, int) cellii in cells.Keys)
             {
                 cells[cellii].self_button.rectangle = new Rectangle(new Point(zero_hex_center.X - step_size / 2 + cellii.Item1 * step_size / 2 + cellii.Item2 * step_size,
@@ -236,6 +245,17 @@ namespace Game1
                     , new Point(step_size, (int)Math.Round(r * step_size)));
             }
         }
+        public void set_step_size_edge_self_buttons()
+        {
+            foreach ((int, int, int ) edgeiii in edges.Keys)
+            {
+                if (edges[edgeiii].self_button != null )
+                {
+                    edges[edgeiii].set_button_vertexes(zero_hex_center, step_size, edge_ratio);
+                }
+            }
+        }
+
         public void create_map_stage1(Dictionary<string, Texture2D> textures_given, HashSet<(int, int)> cells_indexes)
         {
             // base type map, with ports!
@@ -457,7 +477,10 @@ namespace Game1
         
         public void add_edge_buttons_stage_2()
         {
-            //fore
+            foreach ((int, int, int) edgeiii in edges.Keys)
+            {
+
+            }
         }
         public string convert_hash_int_int_to_str(HashSet<(int,int)> hii)
         {
