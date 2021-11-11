@@ -123,13 +123,33 @@ namespace Game1
         // regular button, but polygon, one color!!!
         // new verteces must be with clock direction!!!
         {
+            set_vertexes(new_vertices);
+
+            this.texture2D = texture2D;
+            (int, int) only_test = cut_texture();
+            shape = "polygon";
+            this.action = action;
+            this.activity_phases = activity_phases;
+            this.is_clicked_now = false;
+            this.is_text_field = false;
+            this.layer = layer;
+
+            this.is_text_field = false;
+            this.is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = false;
+
+        }
+
+        public void set_vertexes(Point[] new_vertices)
+        {
             int min_x = new_vertices[0].X;
             int max_x = new_vertices[0].X;
             int min_y = new_vertices[0].Y;
             int max_y = new_vertices[0].Y;
-            foreach(Point v in new_vertices)
+            foreach (Point v in new_vertices)
             {
-                if (v.X>max_x)
+                if (v.X > max_x)
                 {
                     max_x = v.X;
                 }
@@ -149,20 +169,6 @@ namespace Game1
 
             rectangle = new Rectangle(new Point(min_x, min_y), new Point(max_x - min_x, max_y - min_y));
             vertices = new_vertices;
-
-            this.texture2D = texture2D;
-            (int, int) only_test = cut_texture();
-            shape = "polygon";
-            this.action = action;
-            this.activity_phases = activity_phases;
-            this.is_clicked_now = false;
-            this.is_text_field = false;
-            this.layer = layer;
-
-            this.is_text_field = false;
-            this.is_multipul_texture_array = false;
-
-            this.is_multipul_texture_dictionery = false;
 
         }
         
