@@ -35,7 +35,7 @@ namespace Game1
             "Invite friends", "yellow",
             "plus", "minus", "minus_red", "continue", "gray_hex", "blue_hex", "yellow_hex","blue_yellow_hex",
             "num_circle", "2", "3", "4", "5", "6", "8", "9", "10", "11", "12"
-        ,"help", "stage2", "texture_test"});
+        ,"help", "stage2", "texture_test", "green", "red"});
         private static Dictionary<string, Texture2D> textures_to_load = new Dictionary<string, Texture2D>();
         private static Dictionary<string, Button>[] buttons_to_show = new Dictionary<string, Button>[3];
         private static string activity_phase = "normal"; // normal, decleration
@@ -130,6 +130,7 @@ namespace Game1
 
             //Texture2D texture2D = new Texture2D(GraphicsDevice, 100, 100);
 
+            //menu();
             when_create_map();
             //check_clock_wise();
             //lern_draw_gray_cells();
@@ -182,6 +183,17 @@ namespace Game1
                             }
                         }
                     }
+
+                    foreach (var edge in gmap.edges.Values)
+                    {
+                        if (edge.self_button != null)
+                        {
+                            if (edge.self_button.activity_phases.Contains(activity_phase) && edge.self_button.Is_mouse_on())
+                            {
+                                edge.self_button.is_clicked_now = true;
+                            }
+                        }
+                    }
                 }
             }
             if (mouse.LeftButton == ButtonState.Released)
@@ -207,6 +219,14 @@ namespace Game1
                             update_is_clicked_now(cell.num_button);
                         }
                     }
+                    foreach (var edge in gmap.edges.Values)
+                    {
+                        if (edge.self_button != null)
+                        {
+                            update_is_clicked_now(edge.self_button);
+                        }
+                    }
+
                 }
 
 
@@ -302,6 +322,13 @@ namespace Game1
                     if (cell.is_have_cube_num)
                     {
                         draw_button(cell.num_button, spriteBatch);
+                    }
+                }
+                foreach (var edge in gmap.edges.Values)
+                {
+                    if (edge.self_button != null)
+                    {
+                        draw_button(edge.self_button, spriteBatch);
                     }
                 }
             }
@@ -482,7 +509,7 @@ namespace Game1
             add_plus_minus_system("random land", 0, random_land_plus_min_rec, when_increase_rand_land, when_decrease_rand_land);
 
             Rectangle help_rec = new Rectangle(new Point(100, 620), new Point(180, 75));
-            Button help = new Button(help_rec, textures_to_load["help"], help_stage_1, "rectangel", new string[] { "normal" });
+            Button help = new Button(help_rec, textures_to_load["help"], help_func, "rectangel", new string[] { "normal" });
             completly_change_of_buttons.Add("help", help);
             
             Rectangle stage2_rec = new Rectangle(new Point(100, 720), new Point(180, 75));
@@ -513,14 +540,28 @@ namespace Game1
                 }
             }
         }
-        public void help_stage_1()
+        public void help_func()
         {
-            declear("You are in stage 1 of map creaiton!\n\n" +
-                "Yellow cells are land cells.\n" +
-                "Blue cells are sea cells.\n" + 
-                "Yellow-Blue are random 'land or sea' hexs.\n"+
-                "With 'random land' you detrmine how much land\n"+
-                "cells will be among the random.");
+            if (gmap.stage == 1)
+            {
+                declear("You are in stage 1 of map creaiton!\n\n" +
+                    "Yellow cells are land cells.\n" +
+                    "Blue cells are sea cells.\n" +
+                    "Yellow-Blue are random 'land or sea' hexs.\n" +
+                    "With 'random land' you detrmine how much land\n" +
+                    "cells will be among the random.");
+            }
+            else if (gmap.stage == 2) 
+            {
+                declear("You are in stage 2 of mao creation,");
+                declear("the stage of port placing!", "\n\n");
+                declear("Gray roads == no port there");
+                declear("Green roads == port there");
+                declear("Red roads == random ports");
+                declear("random ports plus_minus system == ");
+                declear("== how many random will be ports.");
+
+            }
         }
         public void add_plus_minus_system(string num_to_remember_name, int num_to_remember, Rectangle backround_rec, Action inc_func, Action dec_func)
         {
@@ -631,7 +672,7 @@ namespace Game1
                     rec_indexes.Add((i, j-i/2));
                 }
             }
-            gmap = new GraphicMap(textures_to_load, rec_indexes);
+            gmap = new GraphicMap(textures_to_load, rec_indexes, this);
             gmap.add_cell_self_buttons_stage1(100, new Point(400, 300));
         }
         public void when_log_out()
@@ -970,7 +1011,7 @@ namespace Game1
             Point q1 = new Point(150, 150);
             Point q2 = new Point(150, 50);
             //public Button(Point[] new_vertices, Texture2D texture2D, Action action, string[] activity_phases, int layer = 1)
-            Button b = new Button(new Point[] { p1, p2, p4, p3 }, textures_to_load["texture_test"], literally_nothing, new string[] { "normal" });
+            Button b = new Button(this, new Point[] { p1, p2, p4, p3 }, textures_to_load["texture_test"], literally_nothing, new string[] { "normal" });
             declear(Convert.ToString(b.check_if_in_polygon(q1))
                 + ", " + Convert.ToString(b.check_if_in_polygon(q2)));
         }
@@ -987,12 +1028,12 @@ namespace Game1
             Point q4 = new Point(200, 400);
             Point q3 = new Point(100, 400);
             Point q5 = new Point(50, 350);
-            Button b = new Button(new Point[] { p1, p2, p4 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
+            Button b = new Button(this, new Point[] { p1, p2, p4 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
 
             Rectangle r = new Rectangle(p1, p1);
             Button c = new Button(r, copy_texture(textures_to_load["gray_rec"]), literally_nothing, "rectangel", new string[] { "normal" });
 
-            Button b1 = new Button(new Point[] { q1, q2, q4, q3, q5 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
+            Button b1 = new Button(this, new Point[] { q1, q2, q4, q3, q5 }, copy_texture(textures_to_load["texture_test"]), literally_nothing, new string[] { "normal" });
 
 
             buttons_to_show[1].Add("c", c);
@@ -1057,7 +1098,7 @@ namespace Game1
             Point p4 = new Point((v2.X * ratio + O1.X) / (ratio + 1), (v2.Y * ratio + O1.Y) / (ratio + 1));
 
             Point[] points_e001 = new Point[] { p1, p2, p3, p4 };
-            Button e001 = new Button(points_e001, copy_texture(textures_to_load["gray_rec"]), literally_nothing, new string[] { "normal" }, 2);
+            Button e001 = new Button(this, points_e001, copy_texture(textures_to_load["gray_rec"]), literally_nothing, new string[] { "normal" }, 2);
             buttons_to_show[1].Add("e" + Convert.ToString(edgeiii.Item1)
                 + Convert.ToString(edgeiii.Item2)
                 + Convert.ToString(edgeiii.Item3), e001);
@@ -1089,7 +1130,7 @@ namespace Game1
                 + ", " + Convert.ToString(Button.check_if_clock_wise(p1, p2, p4))
                 + ", " + Convert.ToString(Button.check_if_clock_wise(p1, p3, p2)));
 
-            Button b = new Button(new Point[] { p1, p2, p3 }, copy_texture(textures_to_load["white_rec"]), literally_nothing, new string[] { "normal" });
+            Button b = new Button(this, new Point[] { p1, p2, p3 }, copy_texture(textures_to_load["white_rec"]), literally_nothing, new string[] { "normal" });
             buttons_to_show[1].Add("b", b);
 
             Button c = new Button(new Rectangle(new Point(100, 300), new Point(100, 100)), textures_to_load["white_rec"], literally_nothing, "rectangle", new string[] { "normal" });
@@ -1098,7 +1139,7 @@ namespace Game1
         }
         private void build_the_map(HashSet<(int, int)> cells)
         {
-            gmap = new GraphicMap(textures_to_load, cells);
+            gmap = new GraphicMap(textures_to_load, cells, this);
             gmap.add_cell_self_buttons_stage1(100, new Point(400, 300));
             //gmap.cells[(0, 0)].add_resource("tree", textures_to_load["tree"]);
             gmap.cells[(0, 0)].add_cube_num(5, textures_to_load["5"], gmap.step_size / 4);

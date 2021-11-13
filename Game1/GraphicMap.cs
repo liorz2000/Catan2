@@ -4,6 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Threading;
+using Newtonsoft.Json;
+using System.Linq;
+
 namespace Game1
 {
 
@@ -29,16 +39,17 @@ namespace Game1
         public Point zero_hex_center;
         public int edge_ratio = 5;
         public Dictionary<string, Texture2D> textures;
-
+        public Game1 game;
 
         //public List<Button> cell_buttons = new List<Button>();
         //public List<Button> num_buttons = new List<Button>();
 
-        public GraphicMap(Dictionary<string, Texture2D> textures_given, HashSet<(int, int)> cells_indexes)
+        public GraphicMap(Dictionary<string, Texture2D> textures_given, HashSet<(int, int)> cells_indexes, Game1 game)
         {
             //stage1 intialization
             stage = 1;
             create_map_stage1(textures_given, cells_indexes);
+            this.game = game;
         }
 
         public GraphicMap(Dictionary<string, Texture2D> textures_given, HashSet<(int, int)> cells_indexes,
@@ -233,7 +244,7 @@ namespace Game1
             set_step_size_cell_self_buttons();
             if (stage == 2)
             {
-                set_step_size_edge_self_buttons();
+                add_edge_buttons_stage_2();
             }
         }
         public void set_step_size_cell_self_buttons()
@@ -245,7 +256,7 @@ namespace Game1
                     , new Point(step_size, (int)Math.Round(r * step_size)));
             }
         }
-        public void set_step_size_edge_self_buttons()
+        /*public void set_step_size_edge_self_buttons()
         {
             foreach ((int, int, int ) edgeiii in edges.Keys)
             {
@@ -254,7 +265,7 @@ namespace Game1
                     edges[edgeiii].set_button_vertexes(zero_hex_center, step_size, edge_ratio);
                 }
             }
-        }
+        }*/
 
         public void create_map_stage1(Dictionary<string, Texture2D> textures_given, HashSet<(int, int)> cells_indexes)
         {
@@ -477,11 +488,22 @@ namespace Game1
         
         public void add_edge_buttons_stage_2()
         {
-            foreach ((int, int, int) edgeiii in edges.Keys)
+            foreach (Edge edge in edges.Values)
             {
-
+                edge.edge_vertexs = edge.get_button_vertexes(zero_hex_center, step_size, edge_ratio);
+                Texture2D[] edge_textures = new Texture2D[] { textures["gray_rec"], textures["green"], textures["red"] };
+                if (edge.self_button == null)
+                {
+                    edge.self_button = new Button(this.game, edge.edge_vertexs, edge_textures, Game1.literally_nothing, new string[] { "normal" }, 2);
+                }
+                else
+                {
+                    edge.self_button.set_vertexes(edge.get_button_vertexes(zero_hex_center, step_size, edge_ratio));
+                }
+                
             }
         }
+        
         public string convert_hash_int_int_to_str(HashSet<(int,int)> hii)
         {
             string str = "";

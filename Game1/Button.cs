@@ -119,14 +119,14 @@ namespace Game1
             this.phase_string = "";
         }
 
-        public Button(Point[] new_vertices, Texture2D texture2D, Action action, string[] activity_phases, int layer = 1)
-        // regular button, but polygon, one color!!!
+        public Button(Game1 game, Point[] new_vertices, Texture2D texture2D, Action action, string[] activity_phases, int layer = 1)
+        // regular button, but polygon
         // new verteces must be with clock direction!!!
         {
             set_vertexes(new_vertices);
 
-            this.texture2D = texture2D;
-            (int, int) only_test = cut_texture();
+            this.texture2D = game.copy_texture(texture2D);
+            (int, int) only_test = cut_texture(this.texture2D);
             shape = "polygon";
             this.action = action;
             this.activity_phases = activity_phases;
@@ -136,6 +136,32 @@ namespace Game1
 
             this.is_text_field = false;
             this.is_multipul_texture_array = false;
+
+            this.is_multipul_texture_dictionery = false;
+
+        }
+        public Button(Game1 game, Point[] new_vertices, Texture2D[] all_textures, Action action, string[] activity_phases, int layer = 1)
+        // filping texture array, but polygon
+        // new verteces must be with clock direction!!!
+        {
+            set_vertexes(new_vertices);
+
+            int texture_num = all_textures.Length;
+            this.all_textures = new Texture2D[texture_num];
+            for (int i = 0; i < texture_num; i ++)
+            {
+                this.all_textures[i] = game.copy_texture(all_textures[i]);
+                (int, int) only_test = cut_texture(this.all_textures[i]);
+            }
+            shape = "polygon";
+            this.action = action;
+            this.activity_phases = activity_phases;
+            this.is_clicked_now = false;
+            this.is_text_field = false;
+            this.layer = layer;
+
+            this.is_text_field = false;
+            this.is_multipul_texture_array = true;
 
             this.is_multipul_texture_dictionery = false;
 
@@ -172,21 +198,21 @@ namespace Game1
 
         }
         
-        public (int, int) cut_texture()
+        public (int, int) cut_texture(Texture2D texture_to_cut)
         {
-            Color[] c = new Color[texture2D.Width * texture2D.Height];
-            texture2D.GetData(c);
-            Color[,] c_mat = new Color[texture2D.Height, texture2D.Width];//maybe oposite
+            Color[] c = new Color[texture_to_cut.Width * texture_to_cut.Height];
+            texture_to_cut.GetData(c);
+            Color[,] c_mat = new Color[texture_to_cut.Height, texture_to_cut.Width];//maybe oposite
 
           
-            for (int col = 0; col < texture2D.Width; col++)
+            for (int col = 0; col < texture_to_cut.Width; col++)
                 {
-                for (int row = 0; row < texture2D.Height; row++)
+                for (int row = 0; row < texture_to_cut.Height; row++)
                 {
                     try
                     {
                        
-                        c_mat[row, col] = c[row * texture2D.Width + col];
+                        c_mat[row, col] = c[row * texture_to_cut.Width + col];
                     }
                     catch
                     {
@@ -194,17 +220,17 @@ namespace Game1
                         return (row, col);
 
                     }
-                    int point_of_texcture_pixel_in_rec_x = rectangle.X + col * rectangle.Width / texture2D.Width;
-                    int point_of_texcture_pixel_in_rec_y = rectangle.Y + row * rectangle.Height / texture2D.Height;
+                    int point_of_texcture_pixel_in_rec_x = rectangle.X + col * rectangle.Width / texture_to_cut.Width;
+                    int point_of_texcture_pixel_in_rec_y = rectangle.Y + row * rectangle.Height / texture_to_cut.Height;
                     Point p = new Point(point_of_texcture_pixel_in_rec_x, point_of_texcture_pixel_in_rec_y);
                     if (!check_if_in_polygon(p))
                     {
                         c_mat[row, col] = Color.Transparent;
                     }
-                    c[row * texture2D.Width + col] = c_mat[row, col];
+                    c[row * texture_to_cut.Width + col] = c_mat[row, col];
                 }
             }
-            texture2D.SetData(c);
+            texture_to_cut.SetData(c);
             return (-1, -1);
         }
         public bool Is_mouse_on()

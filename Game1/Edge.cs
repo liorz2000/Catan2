@@ -18,6 +18,7 @@ namespace Game1
         public Dictionary<(int, int, bool), Vertex> vertices;
 
         public Color players_color;
+        public Point[] edge_vertexs;
         public Button self_button;
 
         public Edge(int row, int col, int direction, string port = "")
@@ -40,11 +41,11 @@ namespace Game1
             this.players_color = players_color;
         }
 
-        public void set_button_vertexes(Point zero_hex_center, int step_size, int ratio)
+        public Point[] get_button_vertexes(Point zero_hex_center, int step_size, int ratio)
         {
             
             Point O1 = new Point(zero_hex_center.X + row * step_size / 2 + col * step_size,
-                   zero_hex_center.Y - row * (int)Math.Round(step_size / (2/Math.Sqrt(3))));
+                   zero_hex_center.Y + row * (int)Math.Round(step_size / (2/Math.Sqrt(3))));
             Point v1 = new Point(0, 0);
             Point v2 = new Point(0, 0);
             Point O2 = new Point(0, 0);
@@ -72,7 +73,7 @@ namespace Game1
             Point p4 = new Point((v2.X * ratio + O1.X) / (ratio + 1), (v2.Y * ratio + O1.Y) / (ratio + 1));
 
             Point[] points_e001 = new Point[] { p1, p2, p3, p4 };
-            self_button.set_vertexes(points_e001);
+            return points_e001;
             
         }
 
