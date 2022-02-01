@@ -42,7 +42,7 @@ namespace Game1
         private Dictionary<string, Button> completly_change_of_buttons = null;
         //private Dictionary<string, GraphicMap> maps_to_show = new Dictionary<string, GraphicMap>();
 
-        private List<string> names_of_SpriteFont_to_load = new List<string>(new string[] { "title_font", "24font" });
+        private List<string> names_of_SpriteFont_to_load = new List<string>(new string[] { "title_font", "24font",  @"fonts\24font"});
         private static Dictionary<string, SpriteFont> SpriteFont_to_load = new Dictionary<string, SpriteFont>();
         private static Dictionary<string, GraphicText>[] text_to_show = new Dictionary<string, GraphicText>[3];
         private Dictionary<string, GraphicText> completly_change_of_texts = null;
@@ -130,8 +130,9 @@ namespace Game1
 
             //Texture2D texture2D = new Texture2D(GraphicsDevice, 100, 100);
 
-            //menu();
-            when_create_map();
+            menu();
+            //when_create_map();
+            //change_font_size(@"fonts\24font", 24);
             //check_clock_wise();
             //lern_draw_gray_cells();
             //draw_2();
@@ -288,6 +289,11 @@ namespace Game1
             {
                 update_rand_land_txt_color();
             }
+            if (gmap != null && gmap.stage == 2 && text_to_show[0].ContainsKey("random ports"))
+            {
+                update_rand_ports_txt_color();
+            }
+            
             base.Update(gameTime);
         }
 
@@ -537,6 +543,8 @@ namespace Game1
                 {
                     remove_plus_minus_system("map size");
                     remove_plus_minus_system("random land");
+                    Rectangle random_ports_plus_min_rec = new Rectangle(new Point(100, 490), new Point(220, 110));
+                    add_plus_minus_system("random ports", 0, random_ports_plus_min_rec, when_increase_rand_ports, when_decrease_rand_ports);
                 }
             }
         }
@@ -636,6 +644,17 @@ namespace Game1
                 text_to_show[0]["random land"].txtColor = Color.Black;
             }
         }
+        public void update_rand_ports_txt_color()
+        {
+            if (nums_to_remember["random ports"] < 0 || nums_to_remember["random ports"] > gmap.get_random_ports_number_stage2())
+            {
+                text_to_show[0]["random ports"].txtColor = Color.Red;
+            }
+            else
+            {
+                text_to_show[0]["random ports"].txtColor = Color.Black;
+            }
+        }
         public void when_decrease_rand_land()
         {
             nums_to_remember["random land"] -= 1;
@@ -645,6 +664,16 @@ namespace Game1
         {
             nums_to_remember["random land"] += 1;
             text_to_show[0]["random land"].text = "random land: " + Convert.ToString(nums_to_remember["random land"]);
+        }
+        public void when_decrease_rand_ports()
+        {
+            nums_to_remember["random ports"] -= 1;
+            text_to_show[0]["random ports"].text = "random ports: " + Convert.ToString(nums_to_remember["random ports"]);
+        }
+        public void when_increase_rand_ports()
+        {
+            nums_to_remember["random ports"] += 1;
+            text_to_show[0]["random ports"].text = "random ports: " + Convert.ToString(nums_to_remember["random ports"]);
         }
         public void when_decrease_hex_size()
         {
@@ -856,7 +885,7 @@ namespace Game1
             Member m = null;
             return m;
         }
-        public static void declear(string what_declear, string end = "\n")
+        public static void declear(string what_declear, string end = "\n", string font_name = "24font")
         {
             if (activity_phase == "normal")
             {
@@ -867,7 +896,7 @@ namespace Game1
                 Rectangle ok_rec = new Rectangle(new Point(800, 680), new Point(100, 100));
                 Button ok = new Button(ok_rec, textures_to_load["ok"], when_ok, "rectangel", new string[] { "declear" }, 3);
                 buttons_to_show[1].Add("ok", ok);
-                GraphicText declear_text = new GraphicText(SpriteFont_to_load["24font"], what_declear + end, new Vector2(500, 300), Color.Black, 3);
+                GraphicText declear_text = new GraphicText(SpriteFont_to_load[font_name], what_declear + end, new Vector2(500, 300), Color.Black, 3);
                 text_to_show[1].Add("declear_text", declear_text);
             }
             else if (activity_phase == "declear")
@@ -1159,6 +1188,23 @@ namespace Game1
             Rectangle rec2 = new Rectangle(new Point(p.X - r, p.Y -r), new Point(2*r, 2*r));
             Button num2 = new Button(rec2, textures_to_load["2"], SaveExit, "circle", new string[] { "normal" },2);
             buttons_to_show[1].Add("num2" + Convert.ToString(p), num2);
+        }
+        public void change_font_size(string font_name, int new_size)
+        {
+            string file_name = @"~\..\..\..\..\Content\" + font_name + ".spritefont";
+            string text = File.ReadAllText(file_name);
+            string[] lines = text.Split("\n");
+            string size_line = lines[19];
+            //declear(text);
+            lines[19] = size_line.Substring(0, 10) + Convert.ToString(new_size) + size_line.Substring(size_line.Length - 7, 7);
+            string all_text = string.Join("\n", lines);
+
+            using (StreamWriter outputFile = new StreamWriter(file_name))
+            {
+                outputFile.WriteLine(all_text);
+            }
+            SpriteFont_to_load[font_name] = Content.Load<SpriteFont>(font_name);
+            declear(file_name,"\n", font_name);
         }
     }
 }
