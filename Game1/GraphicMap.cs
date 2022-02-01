@@ -30,7 +30,13 @@ namespace Game1
         public Dictionary<(int, int, bool), Vertex> vertices;
         public Dictionary<string, Texture2D> textures_given;
 
+        //Information from stage1
         public int random_land_balance;
+        public HashSet<(int, int)> sea_cells = new HashSet<(int, int)>();
+        public HashSet<(int, int)> land_cells = new HashSet<(int, int)>();
+        public HashSet<(int, int)> sea_land_cells = new HashSet<(int, int)>();
+        public HashSet<(int, int)> all_cells = new HashSet<(int, int)>();
+
         public Dictionary<string, int> random_reasors_balance;
         public Dictionary<int, int> random_num_balance;
 
@@ -40,6 +46,8 @@ namespace Game1
         public int edge_ratio = 5;
         public Dictionary<string, Texture2D> textures;
         public Game1 game;
+
+        //public
 
         //public List<Button> cell_buttons = new List<Button>();
         //public List<Button> num_buttons = new List<Button>();
@@ -214,6 +222,19 @@ namespace Game1
             foreach((int, int) cellii in cells.Keys)
             {
                 if (cells[cellii].self_button.phase_index == 3)
+                {
+                    counter += 1;
+                }
+            }
+            return counter;
+        }
+
+        public int get_random_ports_number_stage2()
+        {
+            int counter = 0;
+            foreach ((int, int, int ) edgeiii in edges.Keys)
+            {
+                if (edges[edgeiii].self_button.phase_index == 2)
                 {
                     counter += 1;
                 }
@@ -414,10 +435,7 @@ namespace Game1
 
         public void level_up_to_stage2(int random_land_balance = 0)
         {
-            HashSet<(int, int)> sea_cells = new HashSet<(int, int)>();
-            HashSet<(int, int)> land_cells = new HashSet<(int, int)>();
-            HashSet<(int, int)> sea_land_cells = new HashSet<(int, int)>();
-            HashSet<(int,int)> all_cells = new HashSet<(int, int)>();
+        
             this.random_land_balance = random_land_balance;
 
             foreach ((int, int) cellii in cells.Keys)
